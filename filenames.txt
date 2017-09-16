@@ -1,0 +1,13 @@
+group05class1.txt
+group05class2.txt
+group05class3.txt
+
+rd_class1.txt
+rd_class2.txt
+rd_class3.txt
+
+LS_Class1.txt
+LS_Class2.txt
+LS_Class3.txt
+
+Decision region for class 1 and class 2 superposed with training data 
