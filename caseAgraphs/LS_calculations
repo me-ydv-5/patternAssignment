@@ -1,0 +1,22 @@
+confusionMatrix =
+
+   125     0     0
+     0   125     0
+     0     0   125
+
+accuracy =  100
+
+pC1 =  100
+pC2 =  100
+pC3 =  100
+mPc =  100
+
+rC1 =  100
+rC2 =  100
+rC3 =  100
+mRc =  100
+
+fm1 =  100
+fm2 =  100
+fm3 =  100
+mFm =  100
