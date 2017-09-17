@@ -1,0 +1,11 @@
+RightDataInClass1 =  125
+WrongDataInClass1ofClass2 = 0
+WrongDataInClass1ofClass3 = 0
+
+RightDataInClass2 =  125
+WrongDataInClass2ofClass1 = 0
+WrongDataInClass2ofClass3 = 0
+
+WrongDataInClass3ofClass1 = 0
+RightDataInClass3 =  125
+WrongDataInClass3ofClass2 = 0

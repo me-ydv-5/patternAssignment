@@ -32,7 +32,7 @@ trainingSet3 = dataSetforClass3(1:observations,:);
 % hold on;
 % plot(trainingSet3(:,1),trainingSet3(:,2),'co','MarkerSize',10);
 % hold off;
-% legend('Class1','Class2');
+% legend('Class1','Class2','Class3');
 % xlabel('Feature1');
 % ylabel('Feature2');
 %------------------------------------------------------------------------%
@@ -43,7 +43,6 @@ covarianceForClass2 = cov(trainingSet2)
 covarianceForClass3 = cov(trainingSet3)
 
 finalcovariance = covariance(covarianceForClass1,covarianceForClass2,covarianceForClass3)
-finalcovariance(1,1)
 fprintf('Taking the rest 25%% of the data as test..\n')
 
 
@@ -53,22 +52,33 @@ fprintf('Taking the rest 25%% of the data as test..\n')
 testdata1 = dataSetforClass1(observations+1:rows(dataSetforClass1),:);
 x = mean(trainingSet1);
 mu1 = x' ;
-gMatrix1 = gOfX(testdata1,mu1,finalcovariance);
-save result1.csv gMatrix1;
+% gMatrix1 = gOfX(testdata1,mu1,finalcovariance);
+% save result1.csv gMatrix1;
 
 
 testdata2 = dataSetforClass2(observations+1:rows(dataSetforClass2),:);
 x = mean(trainingSet2);
 mu2 = x' ;
-gMatrix2 = gOfX(testdata2,mu2,finalcovariance);
-save result2.csv gMatrix2;
+% gMatrix2 = gOfX(testdata2,mu2,finalcovariance);
+% save result2.csv gMatrix2;
 
 
 testdata3 = dataSetforClass3(observations+1:rows(dataSetforClass3),:);
 x = mean(trainingSet3);
 mu3 = x' ;
-gMatrix3 = gOfX(testdata3,mu3,finalcovariance);
-save result3.csv gMatrix3;
+% gMatrix3 = gOfX(testdata3,mu3,finalcovariance);
+% save result3.csv gMatrix3;
+
+mu1a = mu1(1,1);
+mu1b = mu1(2,1);
+
+mu2a = mu2(1,1);
+mu2b = mu2(2,1);
+
+mu3a = mu3(1,1);
+mu3b = mu3(2,1);
+
+final = finalcovariance(1,1);
 
 %-----------------------------------------------------%
 % Printing the output to files for proving linearly separable data
@@ -77,10 +87,30 @@ fp1 = fopen('red.csv','w');
 fp2 = fopen('blue.csv','w');
 
 %deciding the ranges
+% NLS Data
+k = -4:0.1:4;	
+j = -4:0.1:4;
+% RD Data
+% k = 0:100:2500;	
+% j = 0:100:2500;
+% LS Data
+% k = -30:0.5:30;
+% j = -30:0.5:30;
+[Q,W] = meshgrid(k,j);
+z = -(0.5*(1/final)).*(Q.*2*(mu2a - mu1a)+ W.*2*(mu2b - mu1b));
+z .+ -(0.5*(1/final))*((mu1a)^2 +(mu1b)^2  -(mu2a)^2 - (mu2b)^2);
 
+%deciding the ranges
+% NLS Data
+for x = -4:0.1:2,	
+	for y = -2:0.1:1.5,
+% RD Data
+% for x = 0:100:2500,	
+% 	for y = 0:100:2500,
+% LS Data
+% for x = 5:0.5:25,	
+% 	for y = -15:0.5:15,
 
-for x = 5:0.5:25,	
-	for y = -15:0.5:15,
 		vector = [x , y];
 		vara = gOfX(vector,mu1,finalcovariance) ;
 		varb = gOfX(vector,mu2,finalcovariance) ;
@@ -92,7 +122,20 @@ for x = 5:0.5:25,
 			fprintf(fp1,'%d,%d\n',x,y);
 		endif;
 	endfor
+
 endfor
+
+figure;
+contour(Q,W,z,'showtext','on'); 
+hold on;
+plot(trainingSet1(:,1),trainingSet1(:,2),'ro','MarkerSize',10);
+hold on;
+plot(trainingSet2(:,1),trainingSet2(:,2),'ko','MarkerSize',10);
+hold off;
+xlabel('Feature1');
+ylabel('Feature2');
+legend('Contour Plot of Class 1 and 2','Class1','Class2');
+
 
 fclose(fp1);
 fclose(fp2);
@@ -122,9 +165,30 @@ fp1 = fopen('blue.csv','w');
 fp2 = fopen('cyan.csv','w');
 
 %deciding the ranges
+% NLS Data
+k = -4:0.1:4;	
+j = -4:0.1:4;
+% RD Data
+% k = 0:100:2500;	
+% j = 0:100:2500;
+% LS Data
+% k = -30:0.5:30;
+% j = -30:0.5:30;
+[Q,W] = meshgrid(k,j);
+z = -(0.5*(1/final)).*(Q.*2*(mu3a - mu2a)+ W.*2*(mu3b - mu2b));
+z .+ -(0.5*(1/final))*((mu2a)^2 +(mu2b)^2  -(mu3a)^2 - (mu3b)^2);
 
-for x = -10:0.5:20,	
-	for y = -15:0.5:15,
+%deciding the ranges
+% NLS Data
+for x = -2:0.1:4,	
+	for y = -2:0.1:1.5,
+% RD Data
+% for x = 0:100:2500,	
+% 	for y = 0:100:2500,
+% LS Data
+% for x = -10:0.5:20,	
+% 	for y = -15:0.5:15,
+
 		vector = [x , y];
 		vara = gOfX(vector,mu2,finalcovariance) ;
 		varb = gOfX(vector,mu3,finalcovariance) ;
@@ -134,9 +198,22 @@ for x = -10:0.5:20,
 			fprintf(fp1,'%d,%d\n',x,y);		
 		else 
 			fprintf(fp2,'%d,%d\n',x,y);
+			
 		endif;
 	endfor
 endfor
+
+figure;
+contour(Q,W,z,'showtext','on'); 
+hold on;
+plot(trainingSet2(:,1),trainingSet2(:,2),'ro','MarkerSize',10);
+hold on;
+plot(trainingSet3(:,1),trainingSet3(:,2),'ko','MarkerSize',10);
+hold off;
+xlabel('Feature1');
+ylabel('Feature2');
+legend('Contour Plot of Class 2 and 3','Class2','Class3');
+
 
 fclose(fp1);
 fclose(fp2);
@@ -167,15 +244,38 @@ legend('Class 2','Class 3','Points in decision region of Class3','Points in deci
 fp1 = fopen('red.csv','w');
 fp2 = fopen('cyan.csv','w');
 
-for x = -10:0.5:25,	
-	for y = -15:0.5:15,
+%deciding the ranges
+% NLS Data
+k = -4:0.1:4;	
+j = -4:0.1:4;
+% RD Data
+% k = 0:100:2500;	
+% j = 0:100:2500;
+% LS Data
+% k = -30:0.5:30;
+% j = -30:0.5:30;
+[Q,W] = meshgrid(k,j);
+z = -(0.5*(1/final)).*(Q.*2*(mu1a - mu3a)+ W.*2*(mu1b - mu3b));
+z .+ -(0.5*(1/final))*((mu3a)^2 +(mu3b)^2  -(mu1a)^2 - (mu1b)^2);
+
+%deciding the ranges
+% NLS Data
+for x = -4:0.1:4,	
+	for y = -2:0.1:1.5,
+% RD Data
+% for x = 0:100:2500,	
+% 	for y = 0:100:2500,
+% LS Data
+% for x = -10:0.5:25,	
+% 	for y = -15:0.5:15,
+
 		vector = [x , y];
 		vara = gOfX(vector,mu1,finalcovariance) ;
 		varb = gOfX(vector,mu3,finalcovariance) ;
 		fflush(fp1);
 		fflush(fp2);
 		if vara > varb
-			fprintf(fp1,'%d,%d\n',x,y);		
+			fprintf(fp1,'%d,%d\n',x,y);	
 		else 
 			fprintf(fp2,'%d,%d\n',x,y);
 		endif;
@@ -184,6 +284,18 @@ endfor
 
 fclose(fp1);
 fclose(fp2);
+
+figure;
+contour(Q,W,z,'showtext','on'); 
+hold on;
+plot(trainingSet3(:,1),trainingSet3(:,2),'ro','MarkerSize',10);
+hold on;
+plot(trainingSet1(:,1),trainingSet1(:,2),'ko','MarkerSize',10);
+hold off;
+xlabel('Feature1');
+ylabel('Feature2');
+legend('Contour Plot of Class 3 and 1','Class3','Class1');
+
 
 
 % Plotting the output of the files
@@ -205,83 +317,35 @@ ylabel('Feature 2');
 legend('Class 1','Class 3','Points in decision region of Class3','Points in decision region of Class1');
 
 %------------------------------------------------------------------------%
-%Deciding the accuracy of classifier on test data
 
-WrongDataInClass1 = 0;
-RightDataInClass1 = 0;
-
-for i = 1:rows(testdata1)
-	vector = testdata1(i,:);
-	vara = gOfX(vector,mu1,finalcovariance) ;
-	varb = gOfX(vector,mu2,finalcovariance) ;
-	varc = gOfX(vector,mu3,finalcovariance) ;
-	array = [vara,varb,varc];
-	if max(array) == vara
-		RightDataInClass1 += 1;
-	else
-		WrongDataInClass1 += 1;
-	endif;
-endfor
-
-fprintf('\n');
-RightDataInClass1
-WrongDataInClass1
-fprintf('\n');
-
-WrongDataInClass2 = 0;
-RightDataInClass2 = 0;
-
-for i = 1:rows(testdata2)
-	vector = testdata2(i,:);
-	vara = gOfX(vector,mu1,finalcovariance) ;
-	varb = gOfX(vector,mu2,finalcovariance) ;
-	varc = gOfX(vector,mu3,finalcovariance) ;
-	array = [vara,varb,varc];
-	if max(array) == varb
-		RightDataInClass2 += 1;
-	else 
-		WrongDataInClass2 += 1;
-	endif;
-endfor
-
-RightDataInClass2
-WrongDataInClass2
-fprintf('\n');
-
-WrongDataInClass3 = 0;
-RightDataInClass3 = 0;
-
-for i = 1:rows(testdata3)
-	vector = testdata3(i,:);
-	vara = gOfX(vector,mu1,finalcovariance) ;
-	varb = gOfX(vector,mu2,finalcovariance) ;
-	varc = gOfX(vector,mu3,finalcovariance) ;
-	array = [vara,varb,varc];
-	if max(array) == varc
-		RightDataInClass3 += 1;
-	else 
-		WrongDataInClass3 += 1;
-	endif;
-endfor
-
-RightDataInClass3
-WrongDataInClass3
-fprintf('\n');
-
-
-
-%------------------------------------------------------------------------%
 % Decision Region plot for all classes together with training data superposed
 
 fp1 = fopen('red.csv','w');
 fp2 = fopen('blue.csv','w');
 fp3 = fopen('cyan.csv','w');
+
 %deciding the ranges
+% NLS Data
+k = -4:0.1:4;	
+j = -4:0.1:4;
+% RD Data
+% k = 0:100:2500;	
+% j = 0:100:2500;
+% LS Data
+% k = -30:0.5:30;
+% j = -30:0.5:30;
+[Q,W] = meshgrid(k,j);
 
-
-for x = -10:0.5:25,	
-	for y = -15:0.5:15,
-
+%deciding the ranges
+% NLS Data
+for x = -4:0.1:4,	
+	for y = -2:0.1:1.5,
+% RD Data
+% for x = 0:100:2500,	
+% 	for y = 0:100:2500,
+% LS Data
+% for x = -10:0.5:25,	
+% 	for y = -15:0.5:15,
 		vector = [x , y];
 		vara = gOfX(vector,mu1,finalcovariance) ;
 		varb = gOfX(vector,mu2,finalcovariance) ;
@@ -294,10 +358,11 @@ for x = -10:0.5:25,
 		array = [vara,varb,varc];
 
 		if max(array) == vara 
-			fprintf(fp1,'%d,%d\n',x,y);		
+			fprintf(fp1,'%d,%d\n',x,y);	
 		elseif max(array) == varb
 			fprintf(fp2,'%d,%d\n',x,y);
-		else fprintf(fp3,'%d,%d\n',x,y);
+		else 
+			fprintf(fp3,'%d,%d\n',x,y);
 		endif;
 	endfor
 endfor
@@ -312,7 +377,25 @@ redColor = csvread('red.csv');
 blueColor = csvread('blue.csv');
 cyanColor = csvread('cyan.csv');
 %Plotting the three classes
-%class having red -> magenta, blue -> black
+
+
+z1 = -(0.5*(1/final)).*((Q .- mu1a)^2 + (W .- mu1b)^2);
+z2 = -(0.5*(1/final)).*((Q .- mu2a)^2 + (W .- mu2b)^2);
+z3 = -(0.5*(1/final)).*((Q .- mu3a)^2 + (W .- mu3b)^2);
+z = maximum(z1,z2,z3);
+figure;
+contour(Q,W,z,'showtext','on'); 
+hold on;
+plot(trainingSet1(:,1),trainingSet1(:,2),'ko','MarkerSize',10);
+hold on;
+plot(trainingSet2(:,1),trainingSet2(:,2),'ro','MarkerSize',10);
+hold on;
+plot(trainingSet3(:,1),trainingSet3(:,2),'bo','MarkerSize',10);
+
+hold off;
+xlabel('Feature1');
+ylabel('Feature2');
+legend('Contour Plot of Class 1,2 and 3','Class1','Class2','Class3');
 
 figure;
 plot(trainingSet1(:,1),trainingSet1(:,2),'rx','MarkerSize',10);
@@ -331,4 +414,80 @@ hold off;
 xlabel('Feature 1');
 ylabel('Feature 2');
 legend('Class 1','Class 2','Class3','Points in decision region of Class1','Points in decision region of Class2','Points in decision region of Class3','location','southeast');
+% %------------------------------------------------------------------------%
+
+%Deciding the accuracy of classifier on test data
+RightDataInClass1 = 0;
+WrongDataInClass1ofClass2 = 0;
+WrongDataInClass1ofClass3 = 0;
+
+for i = 1:rows(testdata1)
+	vector = testdata1(i,:);
+	vara = gOfX(vector,mu1,finalcovariance) ;
+	varb = gOfX(vector,mu2,finalcovariance) ;
+	varc = gOfX(vector,mu3,finalcovariance) ;
+	array = [vara,varb,varc];
+	if max(array) == vara
+		RightDataInClass1 += 1;
+	elseif max(array) == varb
+		WrongDataInClass1ofClass2 += 1;
+	else WrongDataInClass1ofClass3 += 1;
+	endif;
+endfor
+
+fprintf('\n');
+RightDataInClass1 
+WrongDataInClass1ofClass2 
+WrongDataInClass1ofClass3
+fprintf('\n');
+
+RightDataInClass2 = 0;
+WrongDataInClass2ofClass1 = 0;
+WrongDataInClass2ofClass3 = 0;
+
+for i = 1:rows(testdata2)
+	vector = testdata2(i,:);
+	vara = gOfX(vector,mu1,finalcovariance) ;
+	varb = gOfX(vector,mu2,finalcovariance) ;
+	varc = gOfX(vector,mu3,finalcovariance) ;
+	array = [vara,varb,varc];
+	if max(array) == varb
+		RightDataInClass2 += 1;
+	elseif max(array) == vara 
+		WrongDataInClass2ofClass1 += 1;
+	else WrongDataInClass2ofClass3 += 1;
+	endif;
+endfor
+
+RightDataInClass2
+WrongDataInClass2ofClass1
+WrongDataInClass2ofClass3
+
+fprintf('\n');
+
+WrongDataInClass3ofClass1 = 0;
+RightDataInClass3 = 0;
+WrongDataInClass3ofClass2 = 0;
+
+for i = 1:rows(testdata3)
+	vector = testdata3(i,:);
+	vara = gOfX(vector,mu1,finalcovariance) ;
+	varb = gOfX(vector,mu2,finalcovariance) ;
+	varc = gOfX(vector,mu3,finalcovariance) ;
+	array = [vara,varb,varc];
+	if max(array) == varc
+		RightDataInClass3 += 1;
+	elseif max(array) == vara 
+		WrongDataInClass3ofClass1 += 1;
+	else WrongDataInClass3ofClass2 += 1;
+	endif;
+endfor
+
+WrongDataInClass3ofClass1 
+RightDataInClass3 
+WrongDataInClass3ofClass2 
+fprintf('\n');
+
+
+
 %------------------------------------------------------------------------%
