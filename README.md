@@ -1,4 +1,4 @@
-# patternAssignment
+# patternAssignment 1
 To run the program of bayesian classifier:  
 -> Go to the specified case folder.  
 -> Open Octave and write "assgn_caseAlphabet" and press Enter  
