@@ -1,0 +1,11 @@
+RightDataInClass1 =  571
+WrongDataInClass1ofClass2 =  23
+WrongDataInClass1ofClass3 =  3
+
+RightDataInClass2 =  138
+WrongDataInClass2ofClass1 =  345
+WrongDataInClass2ofClass3 =  17
+
+RightDataInClass3 =  697
+WrongDataInClass3ofClass1 = 0
+WrongDataInClass3ofClass2 = 0

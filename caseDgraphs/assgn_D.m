@@ -16,11 +16,14 @@ dataSetforClass3 = load(inputFile3);
 %------------------------------------------------------------------------%
 % Choosing first 75% as the traiing set
 fprintf('\n');
-observations = .75*rows(dataSetforClass1)
+observations1 = .75*rows(dataSetforClass1);
+observations2 = .75*rows(dataSetforClass2)
+observations2 = floor(observations2);
+observations3 = .75*rows(dataSetforClass3);
 fprintf('\n');
-trainingSet1 = dataSetforClass1(1:observations,:);
-trainingSet2 = dataSetforClass2(1:observations,:);
-trainingSet3 = dataSetforClass3(1:observations,:);
+trainingSet1 = dataSetforClass1(1:observations1,:);
+trainingSet2 = dataSetforClass2(1:observations2,:);
+trainingSet3 = dataSetforClass3(1:observations3,:);
 
 
 %------------------------------------------------------------------------%
@@ -54,21 +57,21 @@ fprintf('Taking the rest 25%% of the data as test..\n')
 %-----------------------------------------------------%
 % Finding g(x) for all the three classes
 
-testdata1 = dataSetforClass1(observations+1:rows(dataSetforClass1),:);
+testdata1 = dataSetforClass1(observations1+1:rows(dataSetforClass1),:);
 x = mean(trainingSet1);
 mu1 = x' ;
 % gMatrix1 = gOfX(testdata1,mu1,covarianceForClass1);
 % save result1.csv gMatrix1;
 
 
-testdata2 = dataSetforClass2(observations+1:rows(dataSetforClass2),:);
+testdata2 = dataSetforClass2(observations2+1:rows(dataSetforClass2),:);
 x = mean(trainingSet2);
 mu2 = x' ;
 % gMatrix2 = gOfX(testdata2,mu2,covarianceForClass2);
 % save result2.csv gMatrix2;
 
 
-testdata3 = dataSetforClass3(observations+1:rows(dataSetforClass3),:);
+testdata3 = dataSetforClass3(observations3+1:rows(dataSetforClass3),:);
 x = mean(trainingSet3);
 mu3 = x' ;
 % gMatrix3 = gOfX(testdata3,mu3,covarianceForClass3);
@@ -96,6 +99,14 @@ q2 = final2(2,1)*mu2a + final2(2,2)*mu2b ;
 p3 = final3(1,1)*mu3a + final3(1,2)*mu3b ;
 q3 = final3(2,1)*mu3a + final3(2,2)*mu3b ;
 
+probabilityofClass1Elements = observations1/(rows(trainingSet1) + rows(trainingSet2) + rows(trainingSet3));
+probabilityofClass2Elements = observations2/(rows(trainingSet1) + rows(trainingSet2) + rows(trainingSet3));
+probabilityofClass3Elements = observations3/(rows(trainingSet1) + rows(trainingSet2) + rows(trainingSet3));
+
+constantForClass1 = log(probabilityofClass1Elements);
+constantForClass2 = log(probabilityofClass2Elements);
+constantForClass3 = log(probabilityofClass3Elements);
+
 %-----------------------------------------------------%
 % Printing the output to files for proving linearly separable data
 
@@ -107,25 +118,25 @@ fp2 = fopen('blue.csv','w');
 % k = -4:0.1:4;	
 % j = -4:0.1:4;
 % RD Data
-% k = 0:100:2500;	
-% j = 0:100:2500;
+k = 0:100:2500;	
+j = 0:100:2500;
 % LS Data
-k = -30:0.5:30;
-j = -30:0.5:30;
+% k = -30:0.5:30;
+% j = -30:0.5:30;
 [Q,W] = meshgrid(k,j);
 %deciding the ranges
 % NLS Data
 % for x = -4:0.1:2,	
 % 	for y = -2:0.1:1.5,
 % RD Data
-% for x = 0:100:2500,	
-% 	for y = 0:100:2500,
+for x = 0:100:2500,	
+	for y = 0:100:2500,
 % LS Data
-for x = 5:0.5:25,	
-	for y = -15:0.5:15,
+% for x = 5:0.5:25,	
+% 	for y = -15:0.5:15,
 		vector = [x , y];
-		vara = gOfX(vector,mu1,covarianceForClass1) ;
-		varb = gOfX(vector,mu2,covarianceForClass2) ;
+		vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1 ;
+		varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2 ;
 		fflush(fp1);
 		fflush(fp2);
 		if vara < varb
@@ -192,11 +203,11 @@ fp2 = fopen('cyan.csv','w');
 % k = -4:0.1:4;	
 % j = -4:0.1:4;
 % RD Data
-% k = 0:100:2500;	
-% j = 0:100:2500;
+k = 0:100:2500;	
+j = 0:100:2500;
 % LS Data
-k = -30:0.5:30;
-j = -30:0.5:30;
+% k = -30:0.5:30;
+% j = -30:0.5:30;
 [Q,W] = meshgrid(k,j);
 
 %deciding the ranges
@@ -204,14 +215,14 @@ j = -30:0.5:30;
 % for x = -2:0.1:4,	
 % 	for y = -2:0.1:1.5,
 % RD Data
-% for x = 0:100:2500,	
-% 	for y = 0:100:2500,
+for x = 0:100:2500,	
+	for y = 0:100:2500,
 % LS Data
-for x = -10:0.5:20,	
-	for y = -15:0.5:15,
+% for x = -10:0.5:20,	
+% 	for y = -15:0.5:15,
 		vector = [x , y];
-		vara = gOfX(vector,mu2,covarianceForClass2) ;
-		varb = gOfX(vector,mu3,covarianceForClass3) ;
+		vara = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+		varb = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 		fflush(fp1);
 		fflush(fp2);
 		if vara > varb
@@ -278,11 +289,11 @@ fp2 = fopen('cyan.csv','w');
 % k = -4:0.1:4;	
 % j = -4:0.1:4;
 % RD Data
-% k = 0:100:2500;	
-% j = 0:100:2500;
+k = 0:100:2500;	
+j = 0:100:2500;
 % LS Data
-k = -30:0.5:30;
-j = -30:0.5:30;
+% k = -30:0.5:30;
+% j = -30:0.5:30;
 [Q,W] = meshgrid(k,j);
 
 %deciding the ranges
@@ -290,14 +301,14 @@ j = -30:0.5:30;
 % for x = -4:0.1:4,	
 % 	for y = -2:0.1:1.5,
 % RD Data
-% for x = 0:100:2500,	
-% 	for y = 0:100:2500,
+for x = 0:100:2500,	
+	for y = 0:100:2500,
 % LS Data
-for x = -10:0.5:25,	
-	for y = -15:0.5:15,
+% for x = -10:0.5:25,	
+% 	for y = -15:0.5:15,
 		vector = [x , y];
-		vara = gOfX(vector,mu1,covarianceForClass1) ;
-		varb = gOfX(vector,mu3,covarianceForClass3) ;
+		vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1 ;
+		varb = gOfX(vector,mu3,covarianceForClass3) + constantForClass3 ;
 		fflush(fp1);
 		fflush(fp2);
 		if vara > varb
@@ -366,11 +377,11 @@ fp3 = fopen('cyan.csv','w');
 % k = -4:0.1:4;	
 % j = -4:0.1:4;
 % RD Data
-% k = 0:100:2500;	
-% j = 0:100:2500;
+k = 0:100:2500;	
+j = 0:100:2500;
 % LS Data
-k = -30:0.5:30;
-j = -30:0.5:30;
+% k = -30:0.5:30;
+% j = -30:0.5:30;
 [Q,W] = meshgrid(k,j);
 
 %deciding the ranges
@@ -378,15 +389,15 @@ j = -30:0.5:30;
 % for x = -4:0.1:4,	
 % 	for y = -2:0.1:1.5,
 % RD Data
-% for x = 0:100:2500,	
-% 	for y = 0:100:2500,
+for x = 0:100:2500,	
+	for y = 0:100:2500,
 % LS Data
-for x = -10:0.5:25,	
-	for y = -15:0.5:15,
+% for x = -10:0.5:25,	
+% 	for y = -15:0.5:15,
 		vector = [x , y];
-		vara = gOfX(vector,mu1,covarianceForClass1) ;
-		varb = gOfX(vector,mu2,covarianceForClass2) ;
-		varc = gOfX(vector,mu3,covarianceForClass3) ;
+		vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1;
+		varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+		varc = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 		
 		fflush(fp1);
 		fflush(fp2);
@@ -476,9 +487,9 @@ RightDataInClass1 = 0;
 
 for i = 1:rows(testdata1)
 	vector = testdata1(i,:);
-	vara = gOfX(vector,mu1,covarianceForClass1) ;
-	varb = gOfX(vector,mu2,covarianceForClass2) ;
-	varc = gOfX(vector,mu3,covarianceForClass3) ;
+	vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1;
+	varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+	varc = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 	array = [vara,varb,varc];
 	if max(array) == vara
 		RightDataInClass1 += 1;
@@ -497,9 +508,9 @@ RightDataInClass2 = 0;
 
 for i = 1:rows(testdata2)
 	vector = testdata2(i,:);
-	vara = gOfX(vector,mu1,covarianceForClass1) ;
-	varb = gOfX(vector,mu2,covarianceForClass2) ;
-	varc = gOfX(vector,mu3,covarianceForClass3) ;
+	vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1;
+	varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+	varc = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 	array = [vara,varb,varc];
 	if max(array) == varb
 		RightDataInClass2 += 1;
@@ -517,9 +528,9 @@ RightDataInClass3 = 0;
 
 for i = 1:rows(testdata3)
 	vector = testdata3(i,:);
-	vara = gOfX(vector,mu1,covarianceForClass1) ;
-	varb = gOfX(vector,mu2,covarianceForClass2) ;
-	varc = gOfX(vector,mu3,covarianceForClass3) ;
+	vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1;
+	varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+	varc = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 	array = [vara,varb,varc];
 	if max(array) == varc
 		RightDataInClass3 += 1;

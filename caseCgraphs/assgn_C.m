@@ -16,11 +16,14 @@ dataSetforClass3 = load(inputFile3);
 %------------------------------------------------------------------------%
 % Choosing first 75% as the traiing set
 fprintf('\n');
-observations = .75*rows(dataSetforClass1)
+observations1 = .75*rows(dataSetforClass1);
+observations2 = .75*rows(dataSetforClass2)
+observations2 = floor(observations2);
+observations3 = .75*rows(dataSetforClass3);
 fprintf('\n');
-trainingSet1 = dataSetforClass1(1:observations,:);
-trainingSet2 = dataSetforClass2(1:observations,:);
-trainingSet3 = dataSetforClass3(1:observations,:);
+trainingSet1 = dataSetforClass1(1:observations1,:);
+trainingSet2 = dataSetforClass2(1:observations2,:);
+trainingSet3 = dataSetforClass3(1:observations3,:);
 
 
 %------------------------------------------------------------------------%
@@ -54,21 +57,21 @@ fprintf('Taking the rest 25%% of the data as test..\n')
 %-----------------------------------------------------%
 % Finding g(x) for all the three classes
 
-testdata1 = dataSetforClass1(observations+1:rows(dataSetforClass1),:);
+testdata1 = dataSetforClass1(observations1+1:rows(dataSetforClass1),:);
 x = mean(trainingSet1);
 mu1 = x' ;
 % gMatrix1 = gOfX(testdata1,mu1,covarianceForClass1);
 % save result1.csv gMatrix1;
 
 
-testdata2 = dataSetforClass2(observations+1:rows(dataSetforClass2),:);
+testdata2 = dataSetforClass2(observations2+1:rows(dataSetforClass2),:);
 x = mean(trainingSet2);
 mu2 = x' ;
 % gMatrix2 = gOfX(testdata2,mu2,covarianceForClass2);
 % save result2.csv gMatrix2;
 
 
-testdata3 = dataSetforClass3(observations+1:rows(dataSetforClass3),:);
+testdata3 = dataSetforClass3(observations3+1:rows(dataSetforClass3),:);
 x = mean(trainingSet3);
 mu3 = x' ;
 % gMatrix3 = gOfX(testdata3,mu3,covarianceForClass3);
@@ -96,6 +99,13 @@ q2 = final2(2,1)*mu2a + final2(2,2)*mu2b ;
 p3 = final3(1,1)*mu3a + final3(1,2)*mu3b ;
 q3 = final3(2,1)*mu3a + final3(2,2)*mu3b ;
 
+probabilityofClass1Elements = observations1/(rows(trainingSet1) + rows(trainingSet2) + rows(trainingSet3));
+probabilityofClass2Elements = observations2/(rows(trainingSet1) + rows(trainingSet2) + rows(trainingSet3));
+probabilityofClass3Elements = observations3/(rows(trainingSet1) + rows(trainingSet2) + rows(trainingSet3));
+
+constantForClass1 = log(probabilityofClass1Elements);
+constantForClass2 = log(probabilityofClass2Elements);
+constantForClass3 = log(probabilityofClass3Elements);
 
 %-----------------------------------------------------%
 % Printing the output to files for proving linearly separable data
@@ -125,9 +135,9 @@ for x = 0:100:2500,
 % for x = 5:0.5:25,	
 % 	for y = -15:0.5:15,
 		vector = [x , y];
-		vara = gOfX(vector,mu1,covarianceForClass1) ;
-		varb = gOfX(vector,mu2,covarianceForClass2) ;
-		fflush(fp1);
+		vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1 ;
+		varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2 ;
+		fflush(fp1); 
 		fflush(fp2);
 		if vara < varb
 			fprintf(fp2,'%d,%d\n',x,y);		
@@ -145,14 +155,17 @@ B = p1.*Q + q1.*W ;
 L = log(det(covarianceForClass1));
 C = -0.5*(final1(1,1)*mu1a^2 + final1(2,2)*mu1b^2 + 2*final1(1,2)*mu1a*mu1b + L);
 z1 = A + B + C;
+z1 = z1 .+ constantForClass1;
 
 A = -0.5*(final2(1,1).*(Q*Q) + final2(2,2).*(W*W) + 2*final2(1,2).*(Q*W));
 B = p2.*Q + q2.*W ;
 L = log(det(covarianceForClass2));
 C = -0.5*(final2(1,1)*mu2a^2 + final2(2,2)*mu2b^2 + 2*final2(1,2)*mu2a*mu2b + L);
 z2 = A + B + C;
+z2 = z2 .+ constantForClass2;
 
 z = z1 - z2;
+
 figure;
 contour(Q,W,z,'showtext','on'); 
 hold on;
@@ -211,8 +224,8 @@ for x = 0:100:2500,
 % for x = -10:0.5:20,	
 % 	for y = -15:0.5:15,
 		vector = [x , y];
-		vara = gOfX(vector,mu2,covarianceForClass2) ;
-		varb = gOfX(vector,mu3,covarianceForClass3) ;
+		vara = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+		varb = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 		fflush(fp1);
 		fflush(fp2);
 		if vara > varb
@@ -231,12 +244,14 @@ B = p2.*Q + q2.*W ;
 L = log(det(covarianceForClass2));
 C = -0.5*(final2(1,1)*mu2a^2 + final2(2,2)*mu2b^2 + 2*final2(1,2)*mu2a*mu2b + L);
 z2 = A + B + C;
+z2 = z2 .+ constantForClass2;
 
 A = -0.5*(final3(1,1).*(Q*Q) + final3(2,2).*(W*W) + 2*final3(1,2).*(Q*W));
 B = p3.*Q + q3.*W ;
 L = log(det(covarianceForClass3));
 C = -0.5*(final3(1,1)*mu3a^2 + final3(2,2)*mu3b^2 + 2*final3(1,2)*mu3a*mu3b + L);
 z3 = A + B + C;
+z3 = z3 .+ constantForClass3;
 
 z = z2 - z3;
 
@@ -299,8 +314,8 @@ for x = 0:100:2500,
 % for x = -10:0.5:25,	
 % 	for y = -15:0.5:15,
 		vector = [x , y];
-		vara = gOfX(vector,mu1,covarianceForClass1) ;
-		varb = gOfX(vector,mu3,covarianceForClass3) ;
+		vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1 ;
+		varb = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 		fflush(fp1);
 		fflush(fp2);
 		if vara > varb
@@ -319,12 +334,15 @@ B = p3.*Q + q3.*W ;
 L = log(det(covarianceForClass3));
 C = -0.5*(final3(1,1)*mu3a^2 + final3(2,2)*mu3b^2 + 2*final3(1,2)*mu3a*mu3b + L);
 z3 = A + B + C;
+z3 = z3 .+ constantForClass3;
 
 A = -0.5*(final1(1,1).*(Q^2) + final1(2,2).*(W^2) + 2*final1(1,2).*(Q*W));
 B = p1.*Q + q1.*W ;
 L = log(det(covarianceForClass1));
 C = -0.5*(final1(1,1)*mu1a^2 + final1(2,2)*mu1b^2 + 2*final1(1,2)*mu1a*mu1b + L);
 z1 = A + B + C;
+z1 = z1 .+ constantForClass1;
+
 
 z = z3 - z1;
 
@@ -387,9 +405,9 @@ for x = 0:100:2500,
 % for x = -10:0.5:25,	
 % 	for y = -15:0.5:15,
 		vector = [x , y];
-		vara = gOfX(vector,mu1,covarianceForClass1) ;
-		varb = gOfX(vector,mu2,covarianceForClass2) ;
-		varc = gOfX(vector,mu3,covarianceForClass3) ;
+		vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1;
+		varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+		varc = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 		
 		fflush(fp1);
 		fflush(fp2);
@@ -416,18 +434,21 @@ B = p1.*Q + q1.*W ;
 L = log(det(covarianceForClass1));
 C = -0.5*(final1(1,1)*mu1a^2 + final1(2,2)*mu1b^2 + 2*final1(1,2)*mu1a*mu1b + L);
 z1 = A + B + C;
+z1 = z1 .+ constantForClass1;
 
 A = -0.5*(final2(1,1).*(Q*Q) + final2(2,2).*(W*W) + 2*final2(1,2).*(Q*W));
 B = p2.*Q + q2.*W ;
 L = log(det(covarianceForClass2));
 C = -0.5*(final2(1,1)*mu2a^2 + final2(2,2)*mu2b^2 + 2*final2(1,2)*mu2a*mu2b + L);
 z2 = A + B + C;
+z2 = z2 .+ constantForClass2;
 
 A = -0.5*(final3(1,1).*(Q*Q) + final3(2,2).*(W*W) + 2*final3(1,2).*(Q*W));
 B = p3.*Q + q3.*W ;
 L = log(det(covarianceForClass3));
 C = -0.5*(final3(1,1)*mu3a^2 + final3(2,2)*mu3b^2 + 2*final3(1,2)*mu3a*mu3b + L);
 z3 = A + B + C;
+z3 = z3 .+ constantForClass3;
 
 z = maximum(z1,z2,z3);
 
@@ -471,65 +492,79 @@ legend('Class 1','Class 2','Class3','Points in decision region of Class1','Point
 %------------------------------------------------------------------------%
 %Deciding the accuracy of classifier on test data
 
-WrongDataInClass1 = 0;
 RightDataInClass1 = 0;
+WrongDataInClass1ofClass2 = 0;
+WrongDataInClass1ofClass3 = 0;
 
 for i = 1:rows(testdata1)
 	vector = testdata1(i,:);
-	vara = gOfX(vector,mu1,covarianceForClass1) ;
-	varb = gOfX(vector,mu2,covarianceForClass2) ;
-	varc = gOfX(vector,mu3,covarianceForClass3) ;
+	vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1;
+	varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+	varc = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 	array = [vara,varb,varc];
 	if max(array) == vara
 		RightDataInClass1 += 1;
+	elseif max(array) == varb
+		WrongDataInClass1ofClass2 += 1;
 	else
-		WrongDataInClass1 += 1;
+		WrongDataInClass1ofClass3 += 1;
 	endif;
 endfor
 
 fprintf('\n');
-RightDataInClass1
-WrongDataInClass1
+RightDataInClass1 
+WrongDataInClass1ofClass2 
+WrongDataInClass1ofClass3
 fprintf('\n');
 
-WrongDataInClass2 = 0;
 RightDataInClass2 = 0;
+WrongDataInClass2ofClass1 = 0;
+WrongDataInClass2ofClass3 = 0;
 
 for i = 1:rows(testdata2)
 	vector = testdata2(i,:);
-	vara = gOfX(vector,mu1,covarianceForClass1) ;
-	varb = gOfX(vector,mu2,covarianceForClass2) ;
-	varc = gOfX(vector,mu3,covarianceForClass3) ;
+	vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1;
+	varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+	varc = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 	array = [vara,varb,varc];
 	if max(array) == varb
 		RightDataInClass2 += 1;
+	elseif max(array) == vara
+		WrongDataInClass2ofClass1 += 1;
 	else 
-		WrongDataInClass2 += 1;
+		WrongDataInClass2ofClass3 += 1; 
 	endif;
 endfor
 
 RightDataInClass2
-WrongDataInClass2
+WrongDataInClass2ofClass1
+WrongDataInClass2ofClass3
+
 fprintf('\n');
 
-WrongDataInClass3 = 0;
+WrongDataInClass3ofClass1 = 0;
 RightDataInClass3 = 0;
+WrongDataInClass3ofClass2 = 0;
 
 for i = 1:rows(testdata3)
 	vector = testdata3(i,:);
-	vara = gOfX(vector,mu1,covarianceForClass1) ;
-	varb = gOfX(vector,mu2,covarianceForClass2) ;
-	varc = gOfX(vector,mu3,covarianceForClass3) ;
+	vara = gOfX(vector,mu1,covarianceForClass1) + constantForClass1;
+	varb = gOfX(vector,mu2,covarianceForClass2) + constantForClass2;
+	varc = gOfX(vector,mu3,covarianceForClass3) + constantForClass3;
 	array = [vara,varb,varc];
 	if max(array) == varc
 		RightDataInClass3 += 1;
+	elseif max(array) == vara
+		WrongDataInClass3ofClass1 += 1;
 	else 
-		WrongDataInClass3 += 1;
+		WrongDataInClass3ofClass2 += 1;
 	endif;
 endfor
 
-RightDataInClass3
-WrongDataInClass3
+RightDataInClass3 
+WrongDataInClass3ofClass1 
+WrongDataInClass3ofClass2
+
 fprintf('\n');
 
 
